@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CAESAR interpreter</title>
+    <link rel="stylesheet" href="global.css">
+    <style>
+        
+
+            /*local css*/
+            textarea {background-color: bisque;
+        border: 2px solid black;
+    width:75%}
+        #out {
+
+            background-color:black;
+            color:white;
+          
+            font-family: SimSun, Source Code Pro, Arial, Helvetica, sans-serif;
+            border: 5px double grey;
+        }
+        #m {
+            margin: 10px 0;
+        }
+
+        #menu{
+            position:absolute;
+            width: 99%;
+            margin:0px 0px;
+            /*border: none;*/
+            height: 140px;
+        }
+        h1 {margin:10px 0 20px 0;}
+
+        a {color:black}
+        a:hover {color:red}
+        @media (max-width: 600px){
+            textarea {width:95%}
+        }
+    </style>
+</head>
+<body>
+<div class="title">CAESAR online interpreter</div>
+    <br/><div class="navbar"><a href="documentation.html" target="_blank">Documentation</a> • <a href="https://github.com/lasermtv07/caesarlang" target="_new">Github</a> • <a href="https://esolangs.org/wiki/User:Lasermtv" target="_new">Wiki</a></div>
+    <h1>Online interpreter</h1>
+    <div class="i"><i>Online interpreter of the esolang CAESAR. Try to write <span class="hl">save Hello World; yell;</span> for hello world program.
+    </i></div><br><b>Input code:</b><br>
+    <textarea id="code" rows="15" cols="70"></textarea>
+    <br/><button onmousedown="main()" id="m">Execute</button><br/>
+    <br><b>Output:</b><br>
+    <textarea readonly id="out" rows="15" cols="70">&nbsp</textarea>
+    <script>
+        document.getElementById('m').style.width=document.getElementById('out').style.max-width();
+        /*
+        raise x; raises flags A-F;
+            A - put the value on top of the stack on bottom Y
+            B - put the value on bottom of the stack to top Y
+            C - add first and last stack elements together (if stirng NaN), but to memory Y
+            D - add the first and second stack elements together Y
+            E - signal the top stack value to commander Y
+            F - signal the bottom stack value to commander Y
+            G - remove the first value from stack
+        yell; - commander outputs the value in memory Y
+        listen; - commander listens for input, saves it to memory
+        save; - save string value to memory Y
+        signal; - push value in memory on top of the stack Y
+        #; everything until semicolon is comment Y
+        if x do y; checks if memory is x, do xx Y
+        if! x do y; checks if memory is not x, do xx Y
+        move; move to the beggining of the program I
+        stop; stops the program execution Y        
+        */
+       function main(){
+        var stack=[]
+        var mem="non"
+        var out=""
+        var code = document.getElementById("code").value;
+        var tokens1 = code.split(";")
+        var tokens2=[]
+        tokens1.forEach(function(t){
+            if(t !== '' && t.trim().split('')[0] != "#") {tokens2.push(t.trim())}
+
+        })
+        console.log(tokens2);
+        var ri=0
+function i(){
+    if(ri<5000){
+        for(x=0;x<tokens2.length;x++){
+            var s=tokens2[x]
+            s=s.split(" ")
+
+            if(s[0]=="if"){
+                if(s[1]==mem){
+                    console.log("hi")
+                    s.shift(0)
+                    s.shift(1)
+                    console.log(s)
+                }
+            }
+            if(s[0]=="if!"){
+                if(s[1]!=mem){
+                    console.log("hi")
+                    s.shift(0)
+                    s.shift(1)
+                    console.log(s)
+                }
+            }
+            if( s[0] == "save" && s.length>1){s.shift(0)
+            mem=s.join(" ")}
+            if(s[0]=="yell"){out+=mem}
+            if(s[0]=="signal"){stack.unshift(mem)}
+            if(s[0]=="stop"){return false}
+            if(s[0]=="move"){
+            i()
+            return false}
+            if(s[0]=="raise"){
+                s.shift()
+                if(s[0]=="A"){
+                    var t1=stack[0]
+                    stack.shift()
+                    stack.push(t1)
+                }
+                if(s[0]=="B"){
+                    var t2=stack[stack.length-1]
+                    stack.pop()
+                    stack.unshift(t2)
+                }
+                if(s[0]=="C"){
+                    var t3=parseInt(stack[0])
+                    var t4=parseInt(stack[stack.length-1])
+                    mem=t3+t4
+                }
+                if(s[0]=="D"){
+                    var t4=parseInt(stack[0])
+                    var t5=parseInt(stack[1])
+                    mem=t4+t5
+                }
+                if(s[0]=="E"){
+                    mem=stack[0]
+                }
+                if(s[0]=="F"){
+                    mem=stack[stack.length-1]
+                }
+                if(s[0]=="G"){
+                    stack.shift()
+                }
+            }
+        if(s[0]=="listen"){
+            var tx=prompt("Enter input: ")
+            console.log(tx)
+            if(tx==null){mem="non"; return false;}
+            mem=tx
+        }
+        ri++
+        console.log(ri)
+        }
+
+}
+        
+    }
+    i()
+   /* stack.forEach(function(t){
+        if(t.toString() == "NaN") t.p
+    })*/
+        console.log("Stack: " + stack.join("; "))
+        console.log("Memory: " + mem)
+        console.log("Final Output: " + out.toString())
+        document.getElementById('out').innerHTML=out.toString();
+
+
+       }
+    </script>
+</body>
+</html>
